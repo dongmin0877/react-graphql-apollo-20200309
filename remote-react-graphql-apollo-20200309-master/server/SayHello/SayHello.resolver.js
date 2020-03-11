@@ -1,4 +1,4 @@
-// Query => GEET
+// Query => GET
 const resolver = {
   Query: {
     sayHello: (parent, { name }, context, info) => {
@@ -12,7 +12,7 @@ const resolver = {
         return {
           success: true,
           error: null,
-          data: `${name}님 안녕하세요.`
+          data: `${name}님 안녕하세요. `
         };
       }
     }
