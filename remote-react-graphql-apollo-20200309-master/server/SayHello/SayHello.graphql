@@ -1,0 +1,9 @@
+type sayHelloResponse {
+  success: Boolean!
+  error: String
+  data: String
+}
+
+type Query {
+  sayHello(name: String): sayHelloResponse!
+}
