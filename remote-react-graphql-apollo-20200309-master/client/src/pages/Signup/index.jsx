@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
-import { SIGN_UP_USER } from "../../queries";
+import { SIGN_UP_USER } from "./SignupQuery";
+import { SIGN_IN_USER_LOCAL } from "../../shared.local";
 import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
+
 const Signup = props => {
   const initialState = {
     name: "",
     email: "",
     password: ""
   };
+
+  const [signinLocalFn] = useMutation(SIGN_IN_USER_LOCAL);
   const [signupFn] = useMutation(SIGN_UP_USER, {
     onCompleted({ signup }) {
       // 회원가입 실패
@@ -19,25 +23,31 @@ const Signup = props => {
       // 회원가입 성공
       else {
         const token = signup.data;
-        localStorage.setItem("tama", token);
-        toast.info("회원가입성공");
+        signinLocalFn({
+          variables: {
+            token: token
+          }
+        });
+        toast.success("회원가입 성공");
         props.history.push("/");
         return;
       }
     }
   });
   const [formData, setFormData] = useState(initialState);
-  const [isForm, setIsForm] = useState(false);
   const { name, email, password } = formData;
+
   const handleChange = event => {
     const {
       target: { name, value }
     } = event;
+
     setFormData({
       ...formData,
       [name]: value
     });
   };
+
   const handleSubmit = async event => {
     try {
       event.preventDefault();
@@ -49,11 +59,11 @@ const Signup = props => {
         }
       });
       setFormData(initialState);
-      setIsForm(true);
     } catch (error) {
       alert(error);
     }
   };
+
   return (
     <div>
       <h1 style={{ textAlign: "center" }}>회원가입</h1>
@@ -94,6 +104,7 @@ const Signup = props => {
     </div>
   );
 };
+
 const inputStyle = {
   width: "100%",
   marginBottom: "10px",
@@ -103,6 +114,7 @@ const inputStyle = {
   fontWeight: "900",
   boxSizing: "border-box"
 };
+
 const buttonStyle = {
   width: "100%",
   boxSizing: "border-box",
@@ -112,4 +124,5 @@ const buttonStyle = {
   fontSize: "16px",
   fontWeight: "900"
 };
+
 export default withRouter(Signup);

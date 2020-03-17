@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { SIGN_IN_USER } from "./SigninQuery";
+import { SIGN_IN_USER_LOCAL } from "../../shared.local";
 import { withRouter } from "react-router-dom";
 import { toast } from "react-toastify";
+
 const Signin = props => {
   const initialState = {
     email: "",
     password: ""
   };
+
+  const [signinLocalFn] = useMutation(SIGN_IN_USER_LOCAL);
+
   const [signinFn] = useMutation(SIGN_IN_USER, {
     onCompleted({ signin }) {
       // 로그인 실패
@@ -17,17 +22,21 @@ const Signin = props => {
       }
       // 로그인 성공
       else {
-        toast.info("로그인 성공");
+        toast.success("로그인 성공");
         const token = signin.data;
-        localStorage.setItem("tama", token);
+        signinLocalFn({
+          variables: {
+            token: token
+          }
+        });
         props.history.push("/");
         return;
       }
     }
   });
   const [formData, setFormData] = useState(initialState);
-  const [isForm, setIsForm] = useState(false);
   const { email, password } = formData;
+
   const handleChange = event => {
     const {
       target: { name, value }
@@ -37,6 +46,7 @@ const Signin = props => {
       [name]: value
     });
   };
+
   const handleSubmit = async event => {
     try {
       event.preventDefault();
@@ -47,11 +57,11 @@ const Signin = props => {
         }
       });
       setFormData(initialState);
-      setIsForm(true);
     } catch (error) {
       alert(error);
     }
   };
+
   return (
     <div>
       <h1 style={{ textAlign: "center" }}>로그인</h1>
@@ -84,6 +94,7 @@ const Signin = props => {
     </div>
   );
 };
+
 const inputStyle = {
   width: "100%",
   marginBottom: "10px",
@@ -93,6 +104,7 @@ const inputStyle = {
   fontWeight: "900",
   boxSizing: "border-box"
 };
+
 const buttonStyle = {
   width: "100%",
   boxSizing: "border-box",
@@ -102,4 +114,5 @@ const buttonStyle = {
   fontSize: "16px",
   fontWeight: "900"
 };
+
 export default withRouter(Signin);

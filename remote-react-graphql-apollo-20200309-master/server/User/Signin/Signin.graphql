@@ -3,6 +3,7 @@ type SigninResponse {
   error: String
   data: String
 }
+
 type Mutation {
   signin(email: String!, password: String!): SigninResponse!
 }

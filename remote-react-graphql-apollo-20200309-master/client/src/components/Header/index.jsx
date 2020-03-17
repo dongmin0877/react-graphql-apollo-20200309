@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-const Header = () => {
-  const [isAuth, setIsAuth] = useState(Boolean(localStorage.getItem("tama")));
+import { useMutation } from "@apollo/react-hooks";
+import { LOG_OUT_USER_LOCAL } from "../../shared.local";
+import { toast } from "react-toastify";
 
-  console.log(isAuth);
+const Header = ({ isLoggedIn }) => {
+  const [logoutLocalFn] = useMutation(LOG_OUT_USER_LOCAL, {
+    onCompleted() {
+      toast.info("로그아웃되었습니다.");
+    }
+  });
 
   return (
     <div
@@ -36,22 +42,33 @@ const Header = () => {
           display: "flex"
         }}
       >
-        <Link style={LinkStyle} to="/">
-          HOME
-        </Link>
-        <Link style={LinkStyle} to="/signin">
-          SIGN IN
-        </Link>
-        <Link style={LinkStyle} to="/signup">
-          SIGN UP
-        </Link>
-        <Link style={LinkStyle} to="/mypage">
-          MY PAGE
-        </Link>
+        {isLoggedIn ? (
+          <>
+            <Link style={LinkStyle} to="/mypage">
+              MY PAGE
+            </Link>
+            <Link style={LinkStyle} to="!#" onClick={logoutLocalFn}>
+              LOGOUT
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link style={LinkStyle} to="/">
+              HOME
+            </Link>
+            <Link style={LinkStyle} to="/signin">
+              SIGN IN
+            </Link>
+            <Link style={LinkStyle} to="/signup">
+              SIGN UP
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
 };
+
 const LinkStyle = {
   display: "block",
   margin: "0 10px",

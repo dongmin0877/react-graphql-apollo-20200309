@@ -1,16 +1,9 @@
 const User = require("../../../models/User");
-const jwt = require("jsonwebtoken");
-const createJWT = user => {
-  const { _id } = user;
-  return jwt.sign({ _id }, process.env.JWT_SECRET, {
-    expiresIn: "1h"
-  });
-};
+const createJWT = require("../../../utils/createJWT");
 
 const resolver = {
   Mutation: {
     signup: async (parent, { name, email, password }, context, info) => {
-      console.log(name, email, password);
       try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -27,8 +20,6 @@ const resolver = {
         });
 
         const token = await createJWT(newUser);
-
-        console.log(token);
 
         return {
           success: true,
